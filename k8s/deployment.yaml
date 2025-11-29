@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visits-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: visits-app
+  template:
+    metadata:
+      labels:
+        app: visits-app
+    spec:
+      containers:
+        - name: visits-app
+          image: visits-app:local
+          imagePullPolicy: IfNotPresent
+          ports:
+              - containerPort: 8080
+          env:
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-app-config
+                  key: APP_PORT
+            - name: REDIS_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-app-config
+                  key: REDIS_ADDR
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-app-config
+                  key: LOG_LEVEL
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
+
+          # === РЕСУРСЫ ===
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+
+          # === ПРОВЕРКА ЖИВУЧЕСТИ (liveness) ===
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+
+          # === ПРОВЕРКА ГОТОВНОСТИ (readiness) ===
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3

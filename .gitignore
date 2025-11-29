@@ -1,0 +1,38 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build artifacts
+bin/
+build/
+*.out
+
+# Go module/cache
+pkg/
+vendor/
+go.sum
+go.work
+go.work.sum
+
+# Docker
+*.tar
+*.img
+
+# TLS / Certificates (не коммитим приватные ключи!)
+tls/*.key
+tls/*.crt
+
+# Kubernetes temporary files
+*.local.yml
+*.override.yml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# System
+.DS_Store
+Thumbs.db
